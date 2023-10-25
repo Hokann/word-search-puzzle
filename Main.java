@@ -1,5 +1,16 @@
 import java.io.*;
 import java.util.*;
+import java.awt.Point;
+
+class WordWithPath {
+    String word;
+    String path;
+
+    public WordWithPath(String word, String path) {
+        this.word = word;
+        this.path = path;
+    }
+}
 
 public class Main {
     public static void main(String[] args){
@@ -18,10 +29,6 @@ public class Main {
                     for (int i = 0; i < M; i++) {
                         String line = lecteur.nextLine();
                         String[] characters = line.split(" ");
-                        if (characters.length != N) {
-                            System.out.println("Error: Invalid number of columns in row " + (i + 1));
-                            return;
-                        }
                         for (int j = 0; j < N; j++) {
                             grille[i][j] = characters[j].charAt(0);
                         }
@@ -43,18 +50,19 @@ public class Main {
                     TrieSchool trie = new TrieSchool(words);
 
                     // trouver les mots
-                    List<String> foundWords = new ArrayList<>();
+                    List<WordWithPath> foundWords = new ArrayList<>();
+
                     for (int i = 0; i < M; i++) {
                         for (int j = 0; j < N; j++) {
-                            findWords(i, j, "", grille, trie.getRoot(), foundWords);
+                            findWords(i, j, "", grille, trie.getRoot(), new ArrayList<>(), foundWords);
                         }
                     }
 
                     // sort and print
-                    Collections.sort(foundWords);
+                    Collections.sort(foundWords, Comparator.comparing(o -> o.word));
                     System.out.println("-----------------------");
-                    for (String word : foundWords) {
-                        System.out.println(word);
+                    for (WordWithPath wordWithPath : foundWords) {
+                        System.out.println(wordWithPath.word + " " + wordWithPath.path);
                     }
                     System.out.println("-----------------------");
                 }
@@ -64,31 +72,41 @@ public class Main {
             System.out.println("Erreur");
             e.printStackTrace();
         }
-
     }
 
-
-    static void findWords(int x, int y, String currentWord, char[][] grid, TrieSchool.TrieNodeSchool node, List<String> foundWords) {
-        if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length) {
-            return;
-        }
+    static void findWords(int x, int y, String currentWord, char[][] grid, TrieSchool.TrieNodeSchool node, List<Point> currentPath, List<WordWithPath> foundWords) {
+        if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length) { return; }
 
         char ch = grid[x][y];
         if (node.getChildren().containsKey(ch)) {
             currentWord += ch;
+            currentPath.add(new Point(x, y));
             node = node.getChildren().get(ch);
 
             if (node.isWord()) {
-                foundWords.add(currentWord);
+                foundWords.add(new WordWithPath(currentWord, formatPath(currentPath)));
+                currentPath.clear();
             }
 
             for (int xx = -1; xx <= 1; xx++) {
                 for (int yy = -1; yy <= 1; yy++){
-                    findWords(x + xx, y + yy, currentWord, grid, node, foundWords);
-
+                    findWords(x + xx, y + yy, currentWord, grid, node, new ArrayList<>(currentPath), foundWords);
 
                 }
             }
         }
     }
+
+    static String formatPath(List<Point> path) {
+        StringBuilder formattedPath = new StringBuilder();
+        for (int i = 0; i < path.size(); i++) {
+            Point point = path.get(i);
+            formattedPath.append("(").append(point.x).append(",").append(point.y).append(")");
+            if (i < path.size() - 1) {
+                formattedPath.append("->");
+            }
+        }
+        return formattedPath.toString();
+    }
+
 }

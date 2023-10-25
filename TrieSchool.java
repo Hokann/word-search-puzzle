@@ -11,9 +11,6 @@ import java.util.Map;
             public boolean isWord() {
                 return isWord;
             }
-            public void setWord(boolean b){
-                isWord = b;
-            }
 
             // constructor
             public TrieNodeSchool() {
@@ -25,18 +22,12 @@ import java.util.Map;
                 return children;
             }
 
-            @Override
-            public String toString() {
-                return "Node< " + this.children.size() + " children, is a word? " + this.isWord + " >";
-            }
         }
         private TrieNodeSchool root = new TrieNodeSchool(); // root of the Trie
         public TrieNodeSchool getRoot() {
             return root;
         }
-        public void setRoot(TrieNodeSchool root) {
-            this.root = root;
-        }
+
         public void insert( String word ) {
             // insert a word in the Trie
             TrieNodeSchool node = root; // take the root
