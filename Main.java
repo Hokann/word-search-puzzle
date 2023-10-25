@@ -2,6 +2,11 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
+
+    static int[] dx = {-1, -1, -1, 0, 0, 1, 1, 1, 0};
+    static int[] dy = {-1, 0, 1, -1, 1, -1, 0, 1, 0};
+
+
     public static void main(String[] args){
         try {
             File fichier = new File(args[0]);
@@ -34,14 +39,26 @@ public class Main {
                         System.out.println();
                     }
                     System.out.println(Arrays.deepToString(grille));
+  // ------------------------------------------------------------------------------------------------------------------------
+
 
                     // ajout des mots a trouver dans un trie.
                     // There is little sense in trying to search the word TLRSOU because there are no words in English alphabet that start with TLR. So a better idea is to store words in a trie and terminate fast the branches that do not makes sense
                     String[] words = lecteur.nextLine().split(" ");
-                    Trie trie = new Trie(words);
+                    TrieSchool trie = new TrieSchool(words);
+                    System.out.println(trie.search("sea"));     // Output: true
+                    System.out.println(trie.search("son"));  // Output: true
+                    System.out.println(trie.search("share"));   // Output: true
+                    System.out.println(trie.search("willow"));    // Output: true
 
                     // trouver les mots
-                    wordSearch(grille, trie);
+                    Set<String> foundWords = new HashSet<>();
+                    for (int i = 0; i < M; i++) {
+                        for (int j = 0; j < N; j++) {
+                            findWordsInGrid(i, j, "", grille, trie.getRoot(), foundWords);
+                        }
+                    }
+                    System.out.println("Found Words: " + foundWords);
                 }
             }
             lecteur.close();
@@ -51,25 +68,29 @@ public class Main {
         }
 
     }
-    public static List<String> wordSearch(char[][] board, Trie trie) {
-        if (trie.isEmpty()){ return null; }
 
-        List<String> result = new ArrayList<>();
 
-        for(int i = 0; i < board.length; i++) {
-            for(int j = 0; j < board[i].length; j++) {
-                char letter = board[i][j];
-                if (trie.getCurrent().getChildren().containsKey(letter)){
-                    // if we get a letter that could be a word
-                    // store position in queue. (position class + queue class)
-                    //
-
-                    //trie.setCurrent(trie.getCurrent().getChildren().get(letter));
-                    //System.out.println("Number of 2nd letters for "+letter+" is "+trie.getCurrent().getChildren().size());
-                }
-            }
+    static void findWordsInGrid(int x, int y, String currentWord, char[][] grid, TrieSchool.TrieNodeSchool node, Set<String> foundWords) {
+        if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length) {
+            return;
         }
-        return result;
-    }
 
+        char ch = grid[x][y];
+        if (node.getChildren().containsKey(ch)) {
+            currentWord += ch;
+            node = node.getChildren().get(ch);
+
+            if (node.isWord()) {
+                foundWords.add(currentWord);
+                // Handle the found word, such as storing it in a set or any other processing.
+            }
+
+            // Explore all 8 neighboring cells using DFS
+            for (int i = 0; i < 8; i++) {
+                findWordsInGrid(x + dx[i], y + dy[i], currentWord, grid, node, foundWords);
+            }
+
+
+        }
+    }
 }
