@@ -92,7 +92,7 @@ public class Main {
         // si il appartient aux enfants du noeud, on l'ajoute au mot courrant, et on note son chemin
         if (node.getChildren().containsKey(chr)) {
             currWord += chr;
-            currPath.add(new Point(x, y)); // chemin géré par la classe java Point du package awt
+            currPath.add(new Point(x, y)); // chemin géré par la classe java Point
             node = node.getChildren().get(chr); // on passe au prochain noeud
 
             // si on aboutie à une feuille (c-a-d un mot), alors on ajoute ce mot et son chemin à l'array
